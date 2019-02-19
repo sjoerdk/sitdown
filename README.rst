@@ -30,7 +30,8 @@ For when you need to sit down and look at your finances.
 Features
 --------
 
-* TODO
+* Import bank account mutations as text files
+*
 
 Credits
 -------
