@@ -82,5 +82,6 @@ class ABNAMROReader:
         else:
             return None
 
+
 class ReaderException(Exception):
     pass

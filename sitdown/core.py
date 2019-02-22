@@ -6,6 +6,7 @@
 class Mutation:
     """An increase or decrease of money on an account. Basic object for most things in sitdown.
 
+    Is sortable by date by default
     """
 
     def __init__(
@@ -23,7 +24,7 @@ class Mutation:
 
         Parameters
         ----------
-        amount: float
+        amount: Decimal
             amount of money transferred. Negative amount means money is spent
         date: datetime.date
             date of transfer
@@ -35,9 +36,9 @@ class Mutation:
             description of this mutation. Defaults to empty string
         currency: str, optional
             currency in which this mutation is done, Defaults to 'EURO'
-        balance_before: float, optional
+        balance_before: Decimal, optional
             account balance before mutation. Defaults to None
-        balance_after: float, optional
+        balance_after: Decimal, optional
             account balance after mutation. Defaults to None
         """
 
@@ -52,6 +53,9 @@ class Mutation:
 
     def __str__(self):
         return f'Mutation of {self.amount} on {self.date}'
+
+    def __lt__(self, other):
+        return self.date < other.date
 
 
 class BankAccount:
@@ -74,3 +78,5 @@ class BankAccount:
 
     def __str__(self):
         return f'Account {self.description}'
+
+
