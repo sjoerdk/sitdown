@@ -63,7 +63,6 @@ class Filter:
             "This method should be overwritten in implementing classes"
         )
 
-
 class StringFilter(Filter):
     """A filter that matches a string in the mutation description
 

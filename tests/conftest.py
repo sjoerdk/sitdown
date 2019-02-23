@@ -14,7 +14,7 @@ def short_mutation_sequence():
 
 @pytest.fixture
 def long_mutation_sequence():
-    return generate_mutation_sequence(500)
+    return generate_mutation_sequence(200)
 
 
 def generate_mutation_sequence(number):
