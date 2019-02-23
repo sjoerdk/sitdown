@@ -78,10 +78,10 @@ class BankAccount:
         self.description = description
 
     def __str__(self):
-        return f'Account {self.description}'
+        return self.description
 
 
-class Plotable(metaclass=ABCMeta):
+class Plottable(metaclass=ABCMeta):
     """Can be plotted in a matplotlib figure"""
 
     def plot(self, ax):

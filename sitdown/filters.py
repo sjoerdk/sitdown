@@ -1,4 +1,4 @@
-from sitdown.core import Plotable
+from sitdown.core import Plottable
 
 
 class Filter:
@@ -6,9 +6,7 @@ class Filter:
 
     """
 
-    name = "_filter"
-
-    def __init__(self, parent=None, description=""):
+    def __init__(self, parent=None, description="filter"):
         """
 
         Parameters
@@ -16,17 +14,11 @@ class Filter:
         parent: Filter, optional
             Filter before this one in the filter chain
         description: description, optional
-            human readable description of this filter. Defaults to empty string
+            human readable description of this filter. Defaults to "filter"
 
         """
         self.parent = parent
-
-    @property
-    def name(self):
-        if self.parent:
-            return self.parent.name + "_" + self._name
-        else:
-            return self._name
+        self.description = description
 
     def apply(self, mutations):
         """Apply this filter to these mutations. If the filter has parents, apply parent filter first
@@ -149,7 +141,7 @@ class FilterSet(Filter):
         return FilteredDataSet(filtered_data_list=dfs)
 
 
-class FilteredData(Plotable):
+class FilteredData(Plottable):
     """Result of applying a filter to some data
 
     """
@@ -172,7 +164,7 @@ class FilteredData(Plotable):
         pass
 
 
-class FilteredDataSet(Plotable):
+class FilteredDataSet(Plottable):
     """A collection of filtered data"""
 
     def __init__(self, filtered_data_list):

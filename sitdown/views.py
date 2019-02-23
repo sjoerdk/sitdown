@@ -1,6 +1,6 @@
 from typing import List
 
-from sitdown.core import Plotable
+from sitdown.core import Plottable
 from sitdown.filters import FilteredData
 
 
@@ -32,7 +32,7 @@ class FilteredDataCollectionView:
         pass
 
 
-class DataPerMonth(Plotable):
+class DataPerMonth(Plottable):
     def __init__(self, data):
         """
         Parameters

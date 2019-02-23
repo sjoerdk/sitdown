@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from sitdown.filters import StringFilter, FilterSet
+from sitdown.filters import StringFilter, FilterSet, Filter
 from tests.factories import MutationFactory
 
 
@@ -54,3 +54,12 @@ def test_string_filter_set(mutation_sequence_with_set_descriptions):
     # but on mutation is in both sets, so the set should only have 3 unique
     filter_set = FilterSet(filters=filters)
     assert len(filter_set.apply(mutations)) == 3
+
+
+def test_filter():
+    f = Filter(description="some description")
+    with pytest.raises(NotImplementedError):
+        f.apply([MutationFactory()])
+
+    assert f.description == "some description"
+
