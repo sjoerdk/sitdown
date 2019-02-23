@@ -24,7 +24,7 @@ def test_string_filter(mutation_sequence_with_set_descriptions):
     assert len(string_filter.apply(mutation_sequence_with_set_descriptions)) == 2
 
 
-def test_string_filter_chain(short_mutation_sequence):
+def test_string_filter_chain(mutation_sequence_with_set_descriptions):
     """Filters can be chained, so that data is passed through all filters in the chain
 
     Parameters

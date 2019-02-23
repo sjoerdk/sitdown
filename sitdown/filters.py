@@ -7,6 +7,7 @@ class Filter:
     """Can filter a set of mutations
 
     """
+
     name = "_filter"
 
     def __init__(self, parent=None, description=""):
@@ -34,23 +35,43 @@ class Filter:
 
         Returns
         -------
-        FilteredData:
+        List[Mutations]:
             result of applying this filter and its parents to the given mutations
 
         """
         if self.parent:
-            mutations = self.parent.apply(mutations).data
+            mutations = self.parent.apply(mutations)
         return self._filter(mutations)
+
+    def get_filtered_data(self, mutations_in):
+        """Apply this filter to these mutations and return as FilteredData.
+
+        Same as Filter.apply() but returns result in a more informative format
+
+        Returns
+        -------
+        FilteredData:
+            result of applying this filter and its parents to the given mutations
+
+        """
+        return FilteredData(mutations=self.apply(mutations_in), filter_used=self)
 
     def _filter(self, data):
         """Actual filtering for this filter. To be overwritten in child classes
 
+        Parameters
+        ----------
+        data: List[Mutations]
+            list of mutations to filter
+
         Returns
         -------
-        FilteredData
+        List[Mutations]:
             The data filtered by this filter and any of its parents
         """
-        raise NotImplementedError("This method should be overwritten in implementing classes")
+        raise NotImplementedError(
+            "This method should be overwritten in implementing classes"
+        )
 
 
 class StringFilter(Filter):
@@ -67,7 +88,7 @@ class StringFilter(Filter):
 
     def _filter(self, mutations):
         filtered = [x for x in mutations if self.string_to_match in x.description]
-        return FilteredData(mutations=filtered, filter_used=self)
+        return filtered
 
 
 class FilteredData(Plotable):
@@ -95,4 +116,5 @@ class FilteredData(Plotable):
 
 class FilteredDataCollection:
     """A collection of filtered data"""
+
     pass
