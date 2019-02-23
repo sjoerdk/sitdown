@@ -24,6 +24,10 @@ def generate_mutation_sequence(number):
     ----------
     number: int
         number of mutations to generate
+
+    Returns
+    -------
+    Set[Mutation]
     """
     factory.fuzzy.reseed_random(1234)
     mutations = [MutationFactory() for _ in range(number)]
@@ -35,4 +39,4 @@ def generate_mutation_sequence(number):
             mutation.balance_before = previous.balance_after
             mutation.balance_after = mutation.balance_before + mutation.amount
         previous = mutation
-    return mutations
+    return set(mutations)

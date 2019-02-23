@@ -42,17 +42,17 @@ class ABNAMROReader:
 
         Returns
         -------
-        List of Mutation
+        Set[Mutation]
 
         """
         setlocale(LC_NUMERIC, self.LOCALE)
 
-        mutations = []
+        mutations = set()
         with open(input_file, "r") as tabfile:
             reader = DictReader(tabfile, delimiter="\t", fieldnames=self.HEADER_NAMES)
             for line in reader:
                 try:
-                    mutations.append(self.parse_to_mutation(line))
+                    mutations.add(self.parse_to_mutation(line))
                 except ValueError as e:
                     raise ReaderException(f"Error reading line '{line}': {e}")
         return mutations

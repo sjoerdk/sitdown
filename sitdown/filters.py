@@ -1,5 +1,3 @@
-from typing import List
-
 from sitdown.core import Plotable
 
 
@@ -35,7 +33,7 @@ class Filter:
 
         Returns
         -------
-        List[Mutations]:
+        Set[Mutations]:
             result of applying this filter and its parents to the given mutations
 
         """
@@ -61,12 +59,12 @@ class Filter:
 
         Parameters
         ----------
-        data: List[Mutations]
-            list of mutations to filter
+        data: Set[Mutations]
+            set of mutations to filter
 
         Returns
         -------
-        List[Mutations]:
+        Set[Mutations]:
             The data filtered by this filter and any of its parents
         """
         raise NotImplementedError(
@@ -87,8 +85,68 @@ class StringFilter(Filter):
         return f"StringFilter '{self.string_to_match}'"
 
     def _filter(self, mutations):
-        filtered = [x for x in mutations if self.string_to_match in x.description]
+        filtered = {x for x in mutations if self.string_to_match in x.description}
         return filtered
+
+
+class FilterSet(Filter):
+    """A collection of several Filters. Can be used as a regular filter but has extra
+    methods for splitting out results for each element in the set"""
+
+    def __init__(self, filters, **kwargs):
+        """
+
+        Parameters
+        ----------
+        filters: List[Filter]
+            Tbe filters that make up this filter set.
+
+        Notes
+        -----
+        The ordering of the list of filters matters. When filtering with a FilterSet, input data is fed
+        through the first filter first. The remaining data is fed through the second filter, and so on.
+
+        """
+        super().__init__(**kwargs)
+        self.filters = filters
+
+    def _filter(self, mutations):
+        """Apply each filter in this set
+
+        Parameters
+        ----------
+        mutations: Set[Mutation]
+            set of mutations to filter
+
+        Returns
+        -------
+        Set[Mutations]:
+            The data filtered by this filter and any of its parents
+        """
+        data_list = self.get_filtered_data_set(mutations).filtered_data_list
+        mutations_list = [x.data for x in data_list]
+        return set.union(*mutations_list)
+
+    def get_filtered_data_set(self, mutations):
+        """Apply each filter in this set to the data consecutively, return result for all filters
+
+        Parameters
+        ----------
+        mutations: Set[Mutation]
+            input data
+
+        Returns
+        -------
+        FilteredDataSet:
+            Filtered data for each filter
+        """
+        dfs = []
+        data = mutations
+        for fltr in self.filters:
+            filtered = fltr.apply(data)
+            dfs.append(FilteredData(mutations=filtered, filter_used=fltr))
+            data = data - filtered
+        return FilteredDataSet(filtered_data_list=dfs)
 
 
 class FilteredData(Plotable):
@@ -101,8 +159,8 @@ class FilteredData(Plotable):
 
         Parameters
         ----------
-        mutations: List[Mutation]
-            list of mutations that came out of the filter
+        mutations: Set[Mutation]
+            set of mutations that came out of the filter
         filter_used: Filter
             The filter instance that produced the data
         """
@@ -114,7 +172,17 @@ class FilteredData(Plotable):
         pass
 
 
-class FilteredDataCollection:
+class FilteredDataSet(Plotable):
     """A collection of filtered data"""
 
-    pass
+    def __init__(self, filtered_data_list):
+        """
+
+        Parameters
+        ----------
+        filtered_data_list: List[FilteredData]
+        """
+        self.filtered_data_list = filtered_data_list
+
+    def plot(self, ax):
+        pass

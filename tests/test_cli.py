@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Tests for `sitdown` package."""
-
-import pytest
-
 from click.testing import CliRunner
 from sitdown import cli
+
 
 def test_command_line_interface():
     """Test the CLI."""
