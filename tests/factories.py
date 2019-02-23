@@ -1,7 +1,7 @@
 import datetime
 
 import factory
-from factory.fuzzy import FuzzyText, FuzzyDate, FuzzyFloat, FuzzyDecimal
+from factory.fuzzy import FuzzyText, FuzzyDate, FuzzyDecimal
 
 from sitdown.core import Mutation, BankAccount
 
@@ -21,18 +21,3 @@ class MutationFactory(factory.Factory):
     balance_after = factory.LazyAttribute(lambda obj: obj.balance_before + obj.amount)
 
 
-def generate_mutation_sequence():
-    """Generate a list of mutations that makes sense in time """
-    factory.fuzzy.reseed_random(1234)
-    mutations = [MutationFactory() for _ in range(500)]
-    mutations.sort()
-
-    # make sure the balance on the account makes sens for this sequence
-    previous = None
-    for mutation in mutations:
-        if previous:
-            mutation.balance_before = previous.balance_after
-            mutation.balance_after = mutation.balance_before + mutation.amount
-        previous = mutation
-
-    return mutations

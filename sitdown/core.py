@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """Main module."""
+from abc import ABCMeta
 
 
 class Mutation:
@@ -80,3 +81,8 @@ class BankAccount:
         return f'Account {self.description}'
 
 
+class Plotable(metaclass=ABCMeta):
+    """Can be plotted in a matplotlib figure"""
+
+    def plot(self, ax):
+        pass

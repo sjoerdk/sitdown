@@ -1,6 +1,6 @@
-from abc import ABCMeta
 from typing import List
 
+from sitdown.core import Plotable
 from sitdown.filters import FilteredData
 
 
@@ -29,13 +29,6 @@ class FilteredDataCollectionView:
 
     def per_month(self):
         """Aggregate all mutations in this data per month"""
-        pass
-
-
-class Plotable(metaclass=ABCMeta):
-    """Can be plotted in a matplotlib figure"""
-
-    def plot(self, ax):
         pass
 
 
