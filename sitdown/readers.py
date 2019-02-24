@@ -19,8 +19,7 @@ class ABNAMROReader:
 
     """
 
-
-    LOCALE = 'Dutch'
+    LOCALE = 'NL-nl'  # Any locale that uses comma as decimal place indicator
     HEADER_NAMES = [
         "account",
         "currency",
