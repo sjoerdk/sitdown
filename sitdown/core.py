@@ -84,5 +84,19 @@ class BankAccount:
 class Plottable(metaclass=ABCMeta):
     """Can be plotted in a matplotlib figure"""
 
-    def plot(self, ax):
+    def plot(self, ax=None):
+        """Plot this object in to matplotlib axes ax, or create new ax if none given
+
+        Parameters
+        ----------
+        ax: matplotlib.Axes, optional
+            plot into this axes. Defaults to None, in which case a new axes will be created
+            for this plot
+
+        Returns
+        -------
+        matplotlib.Axes
+            The axes into which this plot has been made
+
+        """
         pass

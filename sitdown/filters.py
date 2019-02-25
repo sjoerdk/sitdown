@@ -1,3 +1,5 @@
+from typing import List
+
 from sitdown.core import Plottable
 
 
@@ -63,13 +65,26 @@ class Filter:
             "This method should be overwritten in implementing classes"
         )
 
+
 class StringFilter(Filter):
     """A filter that matches a string in the mutation description
 
     """
 
-    def __init__(self, string_to_match, **kwargs):
+    def __init__(self, string_to_match, description=None, **kwargs):
+        """
+
+        Parameters
+        ----------
+        string_to_match: str
+            Pass mutations for which description contains this
+        description: str, optional
+            description for this filter. Defaults to string_to_match
+        """
         super().__init__(**kwargs)
+        if not description:
+            description = string_to_match
+        self.description = description
         self.string_to_match = string_to_match
 
     def __str__(self):
@@ -84,7 +99,7 @@ class FilterSet(Filter):
     """A collection of several Filters. Can be used as a regular filter but has extra
     methods for splitting out results for each element in the set"""
 
-    def __init__(self, filters, **kwargs):
+    def __init__(self, filters: List[Filter], **kwargs):
         """
 
         Parameters
@@ -135,7 +150,7 @@ class FilterSet(Filter):
         data = mutations
         for fltr in self.filters:
             filtered = fltr.apply(data)
-            dfs.append(FilteredData(mutations=filtered, filter_used=fltr))
+            dfs.append(FilteredData(mutations=filtered, description=fltr.description))
             data = data - filtered
         return FilteredDataSet(filtered_data_list=dfs)
 
@@ -145,19 +160,22 @@ class FilteredData(Plottable):
 
     """
 
-    def __init__(self, mutations, filter_used):
+    def __init__(self, mutations, description='Unlabeled'):
         """
 
         Parameters
         ----------
         mutations: Set[Mutation]
             set of mutations that came out of the filter
-        filter_used: Filter
-            The filter instance that produced the data
+        description: str, optional.
+            name for this data
         """
 
         self.data = mutations
-        self.filter_used = filter_used
+        self.description = description
+
+    def __str__(self):
+        return f"Filtered data {self.description}"
 
     def plot(self, ax):
         pass
