@@ -1,96 +1,114 @@
 import datetime
+
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 import numpy as np
 
-from collections import defaultdict, OrderedDict
+from collections.abc import Mapping
+from collections import defaultdict, OrderedDict, UserDict
 from functools import total_ordering
 from typing import List
-
 
 from sitdown.core import Plottable
 from sitdown.filters import FilteredData
 
 
-class FilteredDataView:
-    """Different ways of looking at filtered data"""
-
-    def __init__(self, data: FilteredData):
-        self.data = data
-
-    def per_month(self):
-        """Aggregate all mutations in this data per month"""
-        pass
-
-
-class FilteredDataCollectionView:
-    """Special methods for displaying and plotting a collection of filtered data simultaneously"""
-
-    def __init__(self, filtered_data_list: List[FilteredData]):
-        """
-
-        Parameters
-        ----------
-        filtered_data_list
-        """
-        self.filtered_data_list = filtered_data_list
-
-    def per_month(self):
-        """Aggregate all mutations in this data per month"""
-        pass
-
-
-class DataPerMonth(Plottable):
-    """Sorts input data per month. Easy to get sum, mutations for a certain month
+class MonthSet(UserDict, Plottable):
+    """An ordered Dictionary-like object of Month: MonthBin. Ordered by month
 
     """
 
-    def __init__(self, filtered_data):
+    def __init__(self, mutations, description="Unnamed"):
         """
         Parameters
         ----------
-        filtered_data: FilteredData
+        mutations: List[Mutations]
+            The mutations in this dataset
+
 
         """
-        self.filtered_data = filtered_data
+        super().__init__(self)
 
-    @property
-    def bins(self):
-        """ Mutations binned per month
+        self.mutations = mutations
+        self.description = description
+
+        months = defaultdict(list)
+        for mutation in mutations:
+            months[Month(mutation.date)].append(mutation)
+
+        self.data = OrderedDict()
+        for x in sorted(list(months.keys())):
+            self.data[x] = MonthBin(mutations=months[x], month=x)
+
+    def __str__(self):
+        return f"Dataset {self.description}"
+
+    def months(self):
+        """List of all months in this series, sorted by date
 
         Returns
         -------
-        List[MonthBin]
-
+        List[Month]
         """
-        bins = defaultdict(list)
-        for mutation in self.filtered_data.data:
-            bins[Month(mutation.date)].append(mutation)
+        return list(self.data.keys())
 
-        return [MonthBin(mutations=y, month=x) for x, y in bins.items()]
+    def bins(self):
+        """List of all MonthBins in this series, sorted by date
+
+         Returns
+         -------
+         List[MonthBin]
+         """
+        return list(self.data.values())
 
     @property
     def min_month(self):
-        return min(self.bins).month
+        if self.months():
+            return self.months()[0]
 
     @property
     def max_month(self):
-        return max(self.bins).month
+        if self.months():
+            return self.months()[-1]
 
-    def sums(self):
-        """Sum of mutations per month
+    @staticmethod
+    def get_month_range(from_month, to_month):
+        """Get all months in between min and max months. For consistent plotting
+
+        Parameters
+        ----------
+        from_month: Month
+            Start with this month.
+        to_month: Month
+            End with this month
+
+        """
+        if from_month and to_month:
+            return [x for x in month_iterator(from_month, to_month)]
+        else:
+            return []
+
+    def get_series(self, from_month=None, to_month=None):
+        """Get MonthBins for each month between the months given, creating empty bin_dict if there is no mutations
+
+        Parameters
+        ----------
+        from_month: Month, optional
+            Start with this month. Defaults to first month in the mutations
+        to_month: Month, optional
+            End with this month. Defaults to last month in the mutations
 
         Returns
         -------
-        OrderedDict[Month, int]
-            total for each month, ordered by month
+        MonthSeries
+            series of bins for each month
+
         """
-        bins = list(self.bins)
-        bins.sort()
-        return OrderedDict([(mbin.month, mbin.sum()) for mbin in bins])
+        return MonthSeries.from_month_set(
+            self, from_month=from_month, to_month=to_month
+        )
 
     def plot(self, ax=None):
-        """Plot this data per month as a bar graph
+        """Plot this mutations per month as a bar graph
 
         Parameters
         ----------
@@ -107,14 +125,13 @@ class DataPerMonth(Plottable):
         if not ax:
             _, ax = plt.subplots()
 
-        sums = self.sums()
-        months = list(sums.keys())
-        sum_values = list(sums.values())
+        months = self.months()
+        sum_values = [x.sum() for x in self.bins()]
 
         ind = np.arange(len(months))
         ax.bar(x=ind, height=sum_values)
 
-        ax.set_ylabel(f"{self.filtered_data.description} (Euro)")
+        ax.set_ylabel(f"{self.description} (Euro)")
         ax.set_xlabel("Month")
         ax.grid(which="both", axis="y")
         ax.set_xticks(ind)
@@ -123,12 +140,115 @@ class DataPerMonth(Plottable):
         return ax
 
 
+class MonthSeries(MonthSet):
+    """A MonthSet that is guaranteed to have all consecutive months between min and max
+
+    Months without mutations will just have empty month bins"""
+
+    def __init__(
+        self, mutations, description="Unnamed", from_month=None, to_month=None
+    ):
+        """Create a consecutive series of month bins with the given mutations.
+
+        When from_month and/or to_month arg given, cut or pad with empty month bins if needed
+
+        Parameters
+        ----------
+        mutations: List[Mutations]
+            The mutations in this dataset
+        from_month: Month, optional
+            Start with this month. Defaults to first month in the mutations
+        to_month: Month, optional
+            End with this month. Defaults to last month in the mutations
+
+
+        """
+        super().__init__(mutations, description)
+
+        # MonthSet might have missing months. Make into range
+        self.data = self.make_into_series(self.data, from_month, to_month)
+
+    @classmethod
+    def from_month_set(cls, month_set, from_month=None, to_month=None):
+        """Create a MonthSeries from A MonthSet.
+
+        For efficient casting from MonthSet. Without needing to sort all mutations again
+
+        Parameters
+        ----------
+        month_set: MonthSet
+            The MonthSet instance to create MonthSeries from
+        from_month: Month, optional
+            Start with this month. Defaults to first month in the mutations
+        to_month: Month, optional
+            End with this month. Defaults to last month in the mutations
+
+        """
+        if not from_month:
+            from_month = month_set.min_month
+        if not to_month:
+            to_month = month_set.max_month
+        series = cls(mutations=month_set.mutations, description=month_set.description)
+        series.data = series.make_into_series(
+            month_set.data, from_month=from_month, to_month=to_month
+        )
+        return series
+
+    def make_into_series(self, bin_dict, from_month, to_month):
+        """Make the given dictionary of bins into a series of consecutive months
+
+        Parameters
+        ----------
+        bin_dict: OrderedDict[Month, MonthBin]:
+            A collection of month bins. Does not need to be oredered or consecutive
+        from_month: Month, optional
+            Start with this month. Defaults to first month in the mutations
+        to_month: Month, optional
+            End with this month. Defaults to last month in the mutations
+
+        Returns
+        -------
+        OrderedDict[Month, MonthBin]
+
+        """
+        if not bin_dict:
+            return bin_dict  # handy empty input dict
+
+        if not from_month:
+            from_month = self.min_month
+        if not to_month:
+            to_month = self.max_month
+
+        bin_dict_series = OrderedDict()
+        for month in self.get_month_range(from_month, to_month):
+            if month in bin_dict:
+                bin_dict_series[month] = bin_dict[month]
+            else:
+                bin_dict_series[month] = MonthBin(mutations=[], month=month)
+        return bin_dict_series
+
+
 @total_ordering
 class Month:
     """Like date, but day is always 1"""
 
     def __init__(self, date):
-        self.date = datetime.date(year=date.year, month=date.month, day=1)
+        """
+
+        Parameters
+        ----------
+        date: datetime.date or str
+            When datetime.date, only the year and week are used.
+            When string, needs to have yyyy/mm format
+        """
+        if type(date) == str:
+            self.date = datetime.datetime.strptime(date, "%Y/%m").date()
+        elif type(date) == datetime.date:
+            self.date = datetime.date(year=date.year, month=date.month, day=1)
+        else:
+            raise ValueError(
+                f"parameter date needs to be str or datetime.date, found {type(date)}"
+            )
 
     def __str__(self):
         return f"{self.date.year}/{self.date.month}"
@@ -161,9 +281,15 @@ class MonthBin:
         self.mutations = mutations
         self.month = month
 
+    def __len__(self):
+        return len(self.mutations)
+
+    def __iter__(self):
+        return self.mutations.__iter__()
+
     @property
     def date(self):
-        """
+        """The date for this bin
 
         Returns
         -------
@@ -199,8 +325,8 @@ def month_iterator(start_month, end_month):
         current = new
 
 
-class MonthMatrix(Plottable):
-    """Per month data for a set of Filtered Datas
+class MonthMatrix(Plottable, UserDict):
+    """Holds MonthSeries for a number of categories. Dictionary of str: MonthSeries
 
     """
 
@@ -211,10 +337,17 @@ class MonthMatrix(Plottable):
         filtered_data_list: List[FilteredData]
 
         """
-        self.filtered_data_list = filtered_data_list
-        self.per_month_list = [
-            DataPerMonth(filtered_data=x) for x in self.filtered_data_list
-        ]
+        super().__init__()
+        # Separate each mutations list into months
+        sets = [MonthSet(mutations=x.mutations, description=x.description) for x in filtered_data_list]
+
+        # determine the full month range of all sets
+        min_month = min([x.min_month for x in sets])
+        max_month = max([x.max_month for x in sets])
+
+        # make all sets into series of the same length
+        series = {x.description: MonthSeries.from_month_set(x, min_month, max_month) for x in sets}
+        self.data = series
 
     @property
     def min_month(self):
@@ -231,10 +364,19 @@ class MonthMatrix(Plottable):
         return [x for x in month_iterator(self.min_month, self.max_month)]
 
     def matrix(self):
-        """Return """
+        """Data summed per month, for each filtered mutations.
+        Could be sparse (Not all dates are filled for each category
 
-        return [DataPerMonth(filtered_data=x) for x in self.filtered_data_list]
+        """
+
+        matrix = {}
+        for per_month in self.per_month_list:
+            matrix[per_month.description] = per_month.get_series(
+                self.min_month, self.max_month
+            )
+
+        return matrix
 
     def plot(self, ax):
-        """Plot this data into the given axis"""
+        """Plot this mutations into the given axis"""
         pass

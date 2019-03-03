@@ -23,7 +23,7 @@ def test_string_filter(mutation_sequence_with_set_descriptions):
 
 
 def test_string_filter_chain(mutation_sequence_with_set_descriptions):
-    """Filters can be chained, so that data is passed through all filters in the chain
+    """Filters can be chained, so that mutations is passed through all filters in the chain
     """
     mutations = mutation_sequence_with_set_descriptions
 

@@ -59,7 +59,7 @@ class Filter:
         Returns
         -------
         Set[Mutations]:
-            The data filtered by this filter and any of its parents
+            The mutations filtered by this filter and any of its parents
         """
         raise NotImplementedError(
             "This method should be overwritten in implementing classes"
@@ -109,8 +109,8 @@ class FilterSet(Filter):
 
         Notes
         -----
-        The ordering of the list of filters matters. When filtering with a FilterSet, input data is fed
-        through the first filter first. The remaining data is fed through the second filter, and so on.
+        The ordering of the list of filters matters. When filtering with a FilterSet, input mutations is fed
+        through the first filter first. The remaining mutations is fed through the second filter, and so on.
 
         """
         super().__init__(**kwargs)
@@ -127,24 +127,24 @@ class FilterSet(Filter):
         Returns
         -------
         Set[Mutations]:
-            The data filtered by this filter and any of its parents
+            The mutations filtered by this filter and any of its parents
         """
-        data_list = self.get_filtered_data_set(mutations).filtered_data_list
-        mutations_list = [x.data for x in data_list]
+        data_list = self.get_filtered_data_set(mutations)
+        mutations_list = [x.mutations for x in data_list]
         return set.union(*mutations_list)
 
     def get_filtered_data_set(self, mutations):
-        """Apply each filter in this set to the data consecutively, return result for all filters
+        """Apply each filter in this set to the mutations consecutively, return result for all filters
 
         Parameters
         ----------
         mutations: Set[Mutation]
-            input data
+            input mutations
 
         Returns
         -------
-        FilteredDataSet:
-            Filtered data for each filter
+        List[FilteredData]:
+            Filtered mutations for each filter
         """
         dfs = []
         data = mutations
@@ -152,11 +152,11 @@ class FilterSet(Filter):
             filtered = fltr.apply(data)
             dfs.append(FilteredData(mutations=filtered, description=fltr.description))
             data = data - filtered
-        return FilteredDataSet(filtered_data_list=dfs)
+        return dfs
 
 
 class FilteredData(Plottable):
-    """Result of applying a filter to some data
+    """Result of applying a filter to some mutations
 
     """
 
@@ -168,30 +168,14 @@ class FilteredData(Plottable):
         mutations: Set[Mutation]
             set of mutations that came out of the filter
         description: str, optional.
-            name for this data
+            name for this mutations
         """
 
-        self.data = mutations
+        self.mutations = mutations
         self.description = description
 
     def __str__(self):
-        return f"Filtered data {self.description}"
-
-    def plot(self, ax):
-        pass
-
-
-class FilteredDataSet(Plottable):
-    """A collection of filtered data"""
-
-    def __init__(self, filtered_data_list):
-        """
-
-        Parameters
-        ----------
-        filtered_data_list: List[FilteredData]
-        """
-        self.filtered_data_list = filtered_data_list
+        return f"Filtered mutations {self.description}"
 
     def plot(self, ax):
         pass
