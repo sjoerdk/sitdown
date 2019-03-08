@@ -30,16 +30,21 @@ def shop_a_b_filtered_data_set():
     """
     mutations = {MutationFactory(description="shop A") for _ in range(20)} | {
         MutationFactory(description="shop B") for _ in range(20)} | {
-        MutationFactory(description="shop B", date=datetime.date(year=2017, month=9, day=1))
+        MutationFactory(description="shop B", date=datetime.date(year=2017, month=9, day=1))} | {
+        MutationFactory(description="shop C")
     }
 
     filter_set = FilterSet(
         filters=[
             StringFilter(string_to_match="shop A"),
             StringFilter(string_to_match="shop B"),
+            StringFilter(string_to_match="shop C")
         ]
     )
     return filter_set.get_filtered_data_set(mutations)
+
+
+
 
 
 def test_month():
@@ -64,6 +69,7 @@ def test_month_series(a_month_set):
     assert len(series) == 4
     assert len(series[Month("2018/03")]) == 0
     assert len(series[Month("2018/04")]) == 10
+    assert series.sums() == [100, 0, 0, 300]
 
 
 def test_month_set_accessor(a_month_set):
@@ -84,7 +90,7 @@ def test_month_set_cast_to_series(a_month_set):
 def test_month_set_plotting(long_mutation_sequence):
     dpm = MonthSet(long_mutation_sequence)
     dpm.plot()
-    # plt.show()
+    #plt.show()
 
 
 def test_month_matrix(shop_a_b_filtered_data_set):
@@ -92,9 +98,16 @@ def test_month_matrix(shop_a_b_filtered_data_set):
     matrix = MonthMatrix(filtered_data_list=shop_a_b_filtered_data_set)
 
     # with this input data, matrix should have two categories:
-    assert list(matrix.keys()) == ['shop A', 'shop B']
+    assert list(matrix.keys()) == ['shop A', 'shop B', 'shop C']
     # month series should be accessible as keys
     assert type(matrix['shop A']) == MonthSeries
     # Both series should have the same date range
     assert matrix['shop A'].min_month == matrix['shop B'].min_month
     assert matrix['shop A'].max_month == matrix['shop B'].max_month
+
+
+def test_month_matrix_plotting(shop_a_b_filtered_data_set):
+
+    matrix = MonthMatrix(filtered_data_list=shop_a_b_filtered_data_set)
+    matrix.plot()
+    plt.show()

@@ -59,6 +59,16 @@ class MonthSet(UserDict, Plottable):
          """
         return list(self.data.values())
 
+    def sums(self):
+        """Summed amount of all mutations per month, sorted by date
+
+        Returns
+        -------
+        List[Decimal]
+        """
+
+        return [x.sum() for x in self.bins()]
+
     @property
     def min_month(self):
         if self.months():
@@ -105,6 +115,7 @@ class MonthSet(UserDict, Plottable):
         return MonthSeries.from_month_set(
             self, from_month=from_month, to_month=to_month
         )
+
 
     def plot(self, ax=None):
         """Plot this mutations per month as a bar graph
@@ -341,20 +352,15 @@ class MonthMatrix(Plottable, UserDict):
         sets = [MonthSet(mutations=x.mutations, description=x.description) for x in filtered_data_list]
 
         # determine the full month range of all sets
-        min_month = min([x.min_month for x in sets])
-        max_month = max([x.max_month for x in sets])
+        self.min_month = min([x.min_month for x in sets])
+        self.max_month = max([x.max_month for x in sets])
 
         # make all sets into series of the same length
-        series = {x.description: MonthSeries.from_month_set(x, min_month, max_month) for x in sets}
+        series = {x.description: MonthSeries.from_month_set(x, self.min_month, self.max_month) for x in sets}
         self.data = series
 
-    @property
-    def min_month(self):
-        return min([x.min_month for x in self.per_month_list])
-
-    @property
-    def max_month(self):
-        return max([x.max_month for x in self.per_month_list])
+    def descriptions(self):
+        return list(self.data.keys())
 
     def get_month_range(self):
         """Get all months in between min and max months. For consistent plotting
@@ -376,6 +382,54 @@ class MonthMatrix(Plottable, UserDict):
 
         return matrix
 
-    def plot(self, ax):
-        """Plot this mutations into the given axis"""
-        pass
+    def plot(self, ax=None):
+        """Plot this matrix as a stacked graph
+
+        Parameters
+        ----------
+        ax: matplotlib.Axes, optional
+            plot into this axes. Defaults to None, in which case a new axes will be created
+            for this plot
+
+        Returns
+        -------
+        matplotlib.Axes
+            The axes into which this plot has been made
+
+        """
+
+        # get sums for each series rounded
+        sums = {x: [int(z) for z in y.sums()] for x, y in self.data.items()}
+
+        months = self.get_month_range()
+        ind = np.arange(len(months))  # the x locations for the bars
+
+        # work out bottom, height for each series by stacking for each month
+        test = 1
+        # start with a height of 0
+        current_height = [0] * len(months)
+        handles = []
+        for series_sums in sums.values():
+            handles.append(plt.bar(ind, series_sums, width=0.35, bottom=current_height))
+            current_height = piece_wise_add(current_height, series_sums)
+
+        # arange for len(months)
+
+        # plt.bar(ind, series, width, bottom)
+
+
+        #plt.ylabel('Scores')
+        #plt.title('Scores by group and gender')
+        #plt.xticks(ind, ('G1', 'G2', 'G3', 'G4', 'G5'))
+        #plt.yticks(np.arange(0, 81, 10))
+        plt.legend(reversed([x[0] for x in handles]), reversed(self.descriptions()))
+
+
+def piece_wise_add(list_a, list_b):
+    """Add each element of list a to list b.
+
+    After trying to get numpy to work with decimals for about 10 minuts
+    it was raising cryptic errors. Enough of that
+    """
+    return [x+y for x, y in zip(list_a, list_b)]
+
