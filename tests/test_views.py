@@ -3,14 +3,15 @@ import matplotlib.pyplot as plt
 import pytest
 
 
-from sitdown.filters import FilteredData, FilterSet, StringFilter
+from sitdown.filters import FilterSet, StringFilter
+from sitdown.core import MutationSet
 from sitdown.views import MonthSet, MonthMatrix, Month, MonthBin, MonthSeries
 from tests.factories import MutationFactory
 
 
 @pytest.fixture
 def mock_filtered_data(long_mutation_sequence):
-    return FilteredData(mutations=long_mutation_sequence)
+    return MutationSet(mutations=long_mutation_sequence)
 
 
 @pytest.fixture

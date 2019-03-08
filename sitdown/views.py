@@ -8,8 +8,7 @@ from collections import defaultdict, OrderedDict, UserDict
 from functools import total_ordering
 from typing import List
 
-from sitdown.core import Plottable
-from sitdown.filters import FilteredData
+from sitdown.core import Plottable, MutationSet
 
 
 class MonthSet(UserDict, Plottable):
@@ -334,7 +333,7 @@ class MonthMatrix(Plottable, UserDict):
         """
         Parameters
         ----------
-        filtered_data_list: List[FilteredData]
+        filtered_data_list: List[MutationSet]
 
         """
         super().__init__()

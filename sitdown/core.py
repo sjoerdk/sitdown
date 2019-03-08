@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """Main module."""
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 
 
 class Mutation:
@@ -84,6 +84,7 @@ class BankAccount:
 class Plottable(metaclass=ABCMeta):
     """Can be plotted in a matplotlib figure"""
 
+    @abstractmethod
     def plot(self, ax=None):
         """Plot this object in to matplotlib axes ax, or create new ax if none given
 
@@ -99,4 +100,30 @@ class Plottable(metaclass=ABCMeta):
             The axes into which this plot has been made
 
         """
+        pass
+
+
+class MutationSet(Plottable):
+    """Set of mutations with a description
+
+    """
+
+    def __init__(self, mutations, description='Unlabeled'):
+        """
+
+        Parameters
+        ----------
+        mutations: Set[Mutation]
+            set of mutations
+        description: str, optional.
+            name for these mutations
+        """
+
+        self.mutations = mutations
+        self.description = description
+
+    def __str__(self):
+        return f"MutationSet '{self.description}'"
+
+    def plot(self, ax):
         pass

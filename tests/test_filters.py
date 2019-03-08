@@ -57,9 +57,8 @@ def test_string_filter_set(mutation_sequence_with_set_descriptions):
 
 
 def test_filter():
-    f = Filter(description="some description")
-    with pytest.raises(NotImplementedError):
-        f.apply([MutationFactory()])
+    """Assert that filter cannot be instatiated directly"""
+    with pytest.raises(TypeError):
+        Filter(description="some description")
 
-    assert f.description == "some description"
 

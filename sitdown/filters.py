@@ -1,9 +1,11 @@
+import abc
+from abc import abstractmethod
 from typing import List
 
-from sitdown.core import Plottable
+from sitdown.core import MutationSet
 
 
-class Filter:
+class Filter(metaclass=abc.ABCMeta):
     """Can filter a set of mutations
 
     """
@@ -23,7 +25,7 @@ class Filter:
         self.description = description
 
     def apply(self, mutations):
-        """Apply this filter to these mutations. If the filter has parents, apply parent filter first
+        """Apply this filter to these mutations. If the filter has parents, apply container filter first
 
         Returns
         -------
@@ -36,18 +38,19 @@ class Filter:
         return self._filter(mutations)
 
     def get_filtered_data(self, mutations_in):
-        """Apply this filter to these mutations and return as FilteredData.
+        """Apply this filter to these mutations and return as MutationSet.
 
         Same as Filter.apply() but returns result in a more informative format
 
         Returns
         -------
-        FilteredData:
+        MutationSet:
             result of applying this filter and its parents to the given mutations
 
         """
-        return FilteredData(mutations=self.apply(mutations_in), filter_used=self)
+        return MutationSet(mutations=self.apply(mutations_in), filter_used=self)
 
+    @abstractmethod
     def _filter(self, data):
         """Actual filtering for this filter. To be overwritten in child classes
 
@@ -61,9 +64,7 @@ class Filter:
         Set[Mutations]:
             The mutations filtered by this filter and any of its parents
         """
-        raise NotImplementedError(
-            "This method should be overwritten in implementing classes"
-        )
+        pass
 
 
 class StringFilter(Filter):
@@ -143,39 +144,15 @@ class FilterSet(Filter):
 
         Returns
         -------
-        List[FilteredData]:
+        List[MutationSet]:
             Filtered mutations for each filter
         """
         dfs = []
         data = mutations
         for fltr in self.filters:
             filtered = fltr.apply(data)
-            dfs.append(FilteredData(mutations=filtered, description=fltr.description))
+            dfs.append(MutationSet(mutations=filtered, description=fltr.description))
             data = data - filtered
         return dfs
 
 
-class FilteredData(Plottable):
-    """Result of applying a filter to some mutations
-
-    """
-
-    def __init__(self, mutations, description='Unlabeled'):
-        """
-
-        Parameters
-        ----------
-        mutations: Set[Mutation]
-            set of mutations that came out of the filter
-        description: str, optional.
-            name for this mutations
-        """
-
-        self.mutations = mutations
-        self.description = description
-
-    def __str__(self):
-        return f"Filtered mutations {self.description}"
-
-    def plot(self, ax):
-        pass
