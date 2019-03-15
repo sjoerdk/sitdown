@@ -410,7 +410,7 @@ class MonthMatrix(Plottable, UserDict):
         current_height = [0] * len(months)
         handles = []
         for series_sums in sums.values():
-            handles.append(plt.bar(ind, series_sums, width=0.35, bottom=current_height))
+            handles.append(plt.bar(ind, series_sums, width=0.8, bottom=current_height))
             current_height = piece_wise_add(current_height, series_sums)
 
         # arange for len(months)
@@ -418,9 +418,9 @@ class MonthMatrix(Plottable, UserDict):
         # plt.bar(ind, series, width, bottom)
 
 
-        #plt.ylabel('Scores')
+        plt.ylabel('amount')
         #plt.title('Scores by group and gender')
-        #plt.xticks(ind, ('G1', 'G2', 'G3', 'G4', 'G5'))
+        plt.xticks(ind, [str(x.date.strftime("%b `%y")) for x in months])
         #plt.yticks(np.arange(0, 81, 10))
         plt.legend(reversed([x[0] for x in handles]), reversed(self.descriptions()))
 
@@ -429,7 +429,7 @@ def piece_wise_add(list_a, list_b):
     """Add each element of list a to list b.
 
     After trying to get numpy to work with decimals for about 10 minuts
-    it was raising cryptic errors. Enough of that
+    it was raising cryptic errors. Enough of that nonsense.
     """
     return [x+y for x, y in zip(list_a, list_b)]
 

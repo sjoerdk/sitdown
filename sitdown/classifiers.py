@@ -10,6 +10,8 @@ so that filters later on do not have to deal with it.
 import abc
 from abc import abstractmethod
 
+from sitdown.core import Mutation
+
 
 class Classifier(metaclass=abc.ABCMeta):
     """Can classify a mutation by adding one or more tags to it"""
@@ -60,22 +62,34 @@ class Category:
         self.name = name
         self.container = container
 
-    def is_contained_by(self, other):
-        """Is this category the same as other, or does it descend from other?
+    def is_in(self, other):
+        """Is this category contained by category 'other'?
+
+        Notes
+        -----
+        Categories contain themselves. So
+        >>> sports = Category('sports')
+        >>> gym = Category('gym', container=sports)
+        >>> gym.is_in(sports)
+        >>> True
+        >>> gym.is_in(gym)
+        >>> True
 
         Parameters
         ----------
         other: Category
+            Category to compare with
 
         Returns
         -------
         Bool
+            True if this category is the same as or is contained by other
         """
         if self.name == other.name:
             return True
         else:
             if self.container:
-                return self.container.is_contained_by(other)
+                return self.container.is_in(other)
             else:
                 return False
 

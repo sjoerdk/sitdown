@@ -25,12 +25,12 @@ def some_categories():
 
 def test_categories(some_categories):
     cat = some_categories
-    assert cat["pool_a"].is_contained_by(cat["pool"])
-    assert cat["pool_a"].is_contained_by(cat["pool"])
-    assert cat["pool_a"].is_contained_by(cat["sports"])
+    assert cat["pool_a"].is_in(cat["pool"])
+    assert cat["pool_a"].is_in(cat["pool"])
+    assert cat["pool_a"].is_in(cat["sports"])
 
-    assert not cat["pool_a"].is_contained_by(cat["gym"])
-    assert not cat["sports"].is_contained_by(cat["gym"])
+    assert not cat["pool_a"].is_in(cat["gym"])
+    assert not cat["sports"].is_in(cat["gym"])
     assert str(cat["sports"]) == 'sports'
 
 
