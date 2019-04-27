@@ -10,4 +10,4 @@ __version__ = '0.1.7'
 from pathlib import Path
 
 BASE_PATH = Path(__file__).parent.absolute()
-GUI_RESOURCE_PATH = BASE_PATH / "gui"
+GUI_RESOURCE_PATH = BASE_PATH / "gui" / "resources"
