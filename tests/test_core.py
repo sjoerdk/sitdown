@@ -3,11 +3,10 @@
 import datetime
 from decimal import Decimal
 
-import pytest
-
 from sitdown.core import BankAccount, MutationSet
 from tests.factories import MutationFactory
 from tests import RESOURCE_PATH
+
 
 def test_objects():
     mutation = MutationFactory(amount=Decimal(10.0), date=datetime.date(year=1990, month=3, day=10))
@@ -18,7 +17,8 @@ def test_objects():
 
 
 def test_mutation_set(tmp_path, short_mutation_sequence):
-
+    """ Test loading and saving of a mutation set
+    """
     org_set = MutationSet(mutations=short_mutation_sequence, description="test_saving")
     file_path = tmp_path / 'mutation_set.pcl'
     with open(file_path, 'wb') as f:
@@ -28,5 +28,3 @@ def test_mutation_set(tmp_path, short_mutation_sequence):
         loaded_set = MutationSet.load(f)
 
     assert loaded_set.mutations == org_set.mutations
-
-

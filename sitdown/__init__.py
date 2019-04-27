@@ -5,3 +5,9 @@
 __author__ = """Sjoerd Kerkstra"""
 __email__ = 'sjoerdk1@xs4all.nl'
 __version__ = '0.1.7'
+
+
+from pathlib import Path
+
+BASE_PATH = Path(__file__).parent.absolute()
+GUI_RESOURCE_PATH = BASE_PATH / "gui"

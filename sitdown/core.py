@@ -180,7 +180,7 @@ class MutationSet(Plottable, Persistable):
 
     @staticmethod
     def load(file):
-        """Load mutation set from open file file
+        """Load mutation set from open file
 
         Parameters
         ----------
