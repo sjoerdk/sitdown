@@ -6,8 +6,7 @@ from PyQt5.QtCore import (QDate, QDateTime, QRegExp, QSortFilterProxyModel, Qt,
 from PyQt5.QtGui import QStandardItemModel, QKeySequence, QIcon
 from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QGridLayout,
                              QGroupBox, QHBoxLayout, QLabel, QLineEdit, QTreeView, QVBoxLayout,
-                             QWidget, QPushButton, QMenuBar, QAction, QStatusBar)
-
+                             QWidget, QPushButton, QMenuBar, QAction, QStatusBar, QTreeView)
 
 SUBJECT, SENDER, DATE = range(3)
 
@@ -76,6 +75,7 @@ class Window(QWidget):
         self.filterCaseSensitivityCheckBox.toggled.connect(self.filterRegExpChanged)
         self.sortCaseSensitivityCheckBox.toggled.connect(self.sortChanged)
 
+        self.labelView = QTreeView()
 
 
         proxyLayout = QGridLayout()
@@ -83,6 +83,7 @@ class Window(QWidget):
         #proxyLayout.addWidget(self.filterPatternLabel, 1, 2)
         proxyLayout.addWidget(self.filterPatternLineEdit, 1, 2)
         proxyLayout.addWidget(self.proxyView, 2, 2)
+        proxyLayout.addWidget(self.labelView, 0, 0, 3, 1)
         #proxyLayout.addWidget(self.filterSyntaxLabel, 2, 0)
         #proxyLayout.addWidget(self.filterSyntaxComboBox, 2, 1, 1, 2)
         #proxyLayout.addWidget(self.filterColumnLabel, 3, 0)
