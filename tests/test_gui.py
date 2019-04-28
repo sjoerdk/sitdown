@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QApplication
 
-from sitdown.gui.main import Window, createMailModel
+from sitdown.gui_old.main import Window, createMailModel
 
 
 def test_gui(short_mutation_sequence):
