@@ -110,4 +110,4 @@ def test_month_matrix_plotting(shop_a_b_filtered_data_set):
 
     matrix = MonthMatrix(filtered_data_list=shop_a_b_filtered_data_set)
     matrix.plot()
-    plt.show()
+    #plt.show()

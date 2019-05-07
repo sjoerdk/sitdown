@@ -1,16 +1,14 @@
 from PyQt5.QtCore import Qt, QAbstractTableModel, QModelIndex, QVariant
-from PyQt5.QtGui import QStandardItemModel
 from PyQt5.QtWidgets import QApplication, QTextEdit, QMainWindow, QAction, QTreeView
 
-from sitdown.core import Mutation
 
-
-class MainWindow(QMainWindow):
+class MainAnotatorWindow(QMainWindow):
     def __init__(self):
-        super(MainWindow, self).__init__()
+        super(MainAnotatorWindow, self).__init__()
 
         self.treeView = QTreeView()
         self.setCentralWidget(self.treeView)
+
 
         self.testAction = QAction("Test", self, shortcut="Ctrl+T", triggered=self.test)
 

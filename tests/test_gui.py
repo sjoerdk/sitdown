@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QStandardItemModel
 from PyQt5.QtWidgets import QApplication
 
-from sitdown.gui.mainwindow import MainWindow, MutationsTableModel
+from sitdown.gui.mainwindow import MainAnotatorWindow, MutationsTableModel
 
 
 def test_gui(short_mutation_sequence):
@@ -15,7 +15,7 @@ def test_gui(short_mutation_sequence):
     import sys
 
     app = QApplication(sys.argv)
-    window = MainWindow()
+    window = MainAnotatorWindow()
 
     model = QStandardItemModel(0, 2)
 
