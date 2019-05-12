@@ -29,9 +29,9 @@ def test_gui(short_mutation_sequence):
 
     model = MutationsTableModel(mutations)
 
-    window.treeView.setModel(model)
-    window.show()
-    sys.exit(app.exec_())
+    window.mutationsListView.setModel(model)
+    #window.show()
+    #sys.exit(app.exec_())
 
 
 

@@ -1,14 +1,25 @@
-from PyQt5.QtCore import Qt, QAbstractTableModel, QModelIndex, QVariant
-from PyQt5.QtWidgets import QApplication, QTextEdit, QMainWindow, QAction, QTreeView
+from PyQt5.QtCore import Qt, QAbstractTableModel, QModelIndex, QVariant, QSortFilterProxyModel
+from PyQt5.QtWidgets import QApplication, QTextEdit, QMainWindow, QAction, QTreeView, QVBoxLayout, QWidget, QLineEdit, \
+    QLabel
 
 
 class MainAnotatorWindow(QMainWindow):
     def __init__(self):
         super(MainAnotatorWindow, self).__init__()
 
-        self.treeView = QTreeView()
-        self.setCentralWidget(self.treeView)
+        self.filterPatternLineEdit = QLineEdit()
+        self.filterPatternLabel = QLabel("&Filter pattern:")
+        self.filterPatternLabel.setBuddy(self.filterPatternLineEdit)
 
+        self.mutationsListView = QTreeView()
+        self.mutationsListView.setSortingEnabled(True)
+
+        self.centralWidget = QWidget()
+        self.centralLayout = QVBoxLayout()
+        self.centralLayout.addWidget(self.filterPatternLineEdit)
+        self.centralLayout.addWidget(self.mutationsListView)
+        self.centralWidget.setLayout(self.centralLayout)
+        self.setCentralWidget(self.centralWidget)
 
         self.testAction = QAction("Test", self, shortcut="Ctrl+T", triggered=self.test)
 
@@ -35,6 +46,7 @@ class MutationsTableModel(QAbstractTableModel):
         4: "category",
         5: "opposite_account",
     }
+    column_numbers = {y: x for x, y in column_names.items()}
 
     def __init__(self, mutations, parent=None):
         """
