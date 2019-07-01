@@ -39,6 +39,8 @@ class ABNAMROReader:
         accounts: List(BankAccount), Optional
             Link mutations to these bank accounts if number matches. For naming accounts. Defaults to empty list
         """
+        if not accounts:
+            accounts = []
         self.accounts = accounts
 
     def read(self, input_file):

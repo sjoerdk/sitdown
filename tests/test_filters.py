@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from sitdown.filters import StringFilter, FilterSet, Filter
+from sitdown.core import BankAccount
+from sitdown.filters import StringFilter, FilterSet, Filter, AccountFilter
 from tests.factories import MutationFactory
 
 
@@ -20,6 +21,21 @@ def test_string_filter(mutation_sequence_with_set_descriptions):
     """Test whether this filter actually filters out strings """
     string_filter = StringFilter(string_to_match="SUPER SHOP")
     assert len(string_filter.apply(mutation_sequence_with_set_descriptions)) == 2
+
+
+def test_account_filter():
+    account1 = BankAccount(number=1233454, description='test1')
+    account2 = BankAccount(number=4356345, description='test2')
+    mutations = [MutationFactory(account=account1),
+                 MutationFactory(account=account1),
+                 MutationFactory(account=account1),
+                 MutationFactory(account=account2),
+                 MutationFactory(account=account2, opposite_account=account1)]
+
+    assert len(AccountFilter(from_account=account1).apply(mutations)) == 3
+    assert len(AccountFilter(from_account=account2).apply(mutations)) == 2
+    assert len(AccountFilter(from_account=account2, to_account=account1).apply(mutations)) == 1
+    assert len(AccountFilter().apply(mutations)) == 5
 
 
 def test_string_filter_chain(mutation_sequence_with_set_descriptions):

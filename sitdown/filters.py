@@ -96,6 +96,54 @@ class StringFilter(Filter):
         return filtered
 
 
+class AccountFilter(Filter):
+    """A filter that matches only the given account to and from
+
+    """
+
+    def __init__(self, from_account=None, to_account=None, description=None, **kwargs):
+        """
+
+        Parameters
+        ----------
+        from_account: BankAccount, optional
+            Pass mutations that are coming from the given account, defaults to any (pass all)
+        to_account: BankAccount, optional
+            Pass mutations that are going to the given account, defaults to any (pass all)
+        description: str, optional
+            description for this filter.
+        """
+        super().__init__(**kwargs)
+        self.from_account = from_account
+        self.to_account = to_account
+        if not description:
+            description = self.from_to_string()
+        self.description = description
+
+    def from_to_string(self):
+        if self.from_account:
+            frm = str(self.from_account)
+        else:
+            frm = '*'
+
+        if self.to_account:
+            to = str(self.to_account)
+        else:
+            to = '*'
+        return f'From {frm} to {to}'
+
+    def __str__(self):
+        return f"AccountFilter '{self.from_to_string()}'"
+
+    def _filter(self, mutations):
+        filtered = mutations
+        if self.from_account:
+            filtered = {x for x in mutations if x.account == self.from_account}
+        if self.to_account:
+            filtered = {x for x in filtered if x.opposite_account == self.to_account}
+        return filtered
+
+
 class FilterSet(Filter):
     """A collection of several Filters. Can be used as a regular filter but has extra
     methods for splitting out results for each element in the set"""
@@ -135,7 +183,7 @@ class FilterSet(Filter):
         return set.union(*mutations_list)
 
     def get_filtered_data_set(self, mutations):
-        """Apply each filter in this set to the mutations consecutively, return result for all filters
+        """Apply each filter in this set to the mutations consecutively, return result for all filters.
 
         Parameters
         ----------
