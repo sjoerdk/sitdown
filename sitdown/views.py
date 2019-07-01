@@ -3,7 +3,6 @@ import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 
-from collections.abc import Mapping
 from collections import defaultdict, OrderedDict, UserDict
 from functools import total_ordering
 from typing import List
@@ -115,7 +114,6 @@ class MonthSet(UserDict, Plottable):
         return MonthSeries.from_month_set(
             self, from_month=from_month, to_month=to_month
         )
-
 
     def plot(self, ax=None):
         """Plot this mutations per month as a bar graph

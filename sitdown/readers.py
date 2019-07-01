@@ -31,6 +31,16 @@ class ABNAMROReader:
         "description",
     ]
 
+    def __init__(self, accounts=None):
+        """
+
+        Parameters
+        ----------
+        accounts: List(BankAccount), Optional
+            Link mutations to these bank accounts if number matches. For naming accounts. Defaults to empty list
+        """
+        self.accounts = accounts
+
     def read(self, input_file):
         """Try to read ABN AMRO input file and parse contents as mutations
 
@@ -56,13 +66,31 @@ class ABNAMROReader:
                     raise ReaderException(f"Error reading line '{line}': {e}")
         return mutations
 
+    def get_account(self, account_number):
+        """Return a known account if possible, otherwise create a new account and memorize that
+        Parameters
+        ----------
+        account_number: str
+            Account number to search for in known accounts
+
+        Returns
+        -------
+        BankAccount
+        """
+        try:
+            return next((x for x in self.accounts if x.number == account_number))
+        except StopIteration:
+            new = BankAccount(number=account_number, description=account_number)
+            self.accounts.append(new)
+            return new
+
     def parse_to_mutation(self, line):
         """Try to parse given line to mutation object
 
         """
         return Mutation(amount=atof(line['amount']),
                         date=datetime.strptime(line['date'], '%Y%m%d').date(),
-                        account=BankAccount(number=line['account']),
+                        account=self.get_account(account_number=line['account']),
                         currency=line['currency'],
                         opposite_account=self.find_iban(line['description']),
                         description=line['description'],
