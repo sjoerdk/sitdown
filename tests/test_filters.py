@@ -3,7 +3,7 @@
 import pytest
 
 from sitdown.core import BankAccount
-from sitdown.filters import StringFilter, FilterSet, Filter, AccountFilter
+from sitdown.filters import StringFilter, FilterSet, Filter, AccountFilter, AmountFilter
 from tests.factories import MutationFactory
 
 
@@ -36,6 +36,13 @@ def test_account_filter():
     assert len(AccountFilter(from_account=account2).apply(mutations)) == 2
     assert len(AccountFilter(from_account=account2, to_account=account1).apply(mutations)) == 1
     assert len(AccountFilter().apply(mutations)) == 5
+
+
+def test_amount_filter(short_mutation_sequence):
+    assert len(short_mutation_sequence) == 10
+    assert len(AmountFilter(from_amount=200).apply(short_mutation_sequence)) == 7
+    assert len(AmountFilter(to_amount=200).apply(short_mutation_sequence)) == 3
+    assert len(AmountFilter(from_amount=100, to_amount=200).apply(short_mutation_sequence)) == 1
 
 
 def test_string_filter_chain(mutation_sequence_with_set_descriptions):

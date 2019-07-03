@@ -124,13 +124,13 @@ class AccountFilter(Filter):
         if self.from_account:
             frm = str(self.from_account)
         else:
-            frm = '*'
+            frm = "*"
 
         if self.to_account:
             to = str(self.to_account)
         else:
-            to = '*'
-        return f'From {frm} to {to}'
+            to = "*"
+        return f"From {frm} to {to}"
 
     def __str__(self):
         return f"AccountFilter '{self.from_to_string()}'"
@@ -141,6 +141,60 @@ class AccountFilter(Filter):
             filtered = {x for x in mutations if x.account == self.from_account}
         if self.to_account:
             filtered = {x for x in filtered if x.opposite_account == self.to_account}
+        return filtered
+
+
+class AmountFilter(Filter):
+    """A filter that matches a range of amounts
+
+    """
+
+    def __init__(
+        self,
+        from_amount=None,
+        to_amount=None,
+        description=None,
+        **kwargs,
+    ):
+        """
+
+        Parameters
+        ----------
+        from_amount: int, optional
+            pass all mutations for which amount is greater than or equal to this, Defaults to having no lower bound
+        to_amount: int, optional
+            pass all mutations for which amount is lower than this this, Defaults to having no upper bound
+        description: str, optional
+            description for this filter.
+        """
+        super().__init__(**kwargs)
+        self.from_amount = from_amount
+        self.to_amount = to_amount
+        if not description:
+            description = self.from_to_string()
+        self.description = description
+
+    def from_to_string(self):
+        if self.from_amount:
+            frm = str(self.from_amount)
+        else:
+            frm = "*"
+
+        if self.to_amount:
+            to = str(self.to_amount)
+        else:
+            to = "*"
+        return f"From {frm} to {to}"
+
+    def __str__(self):
+        return f"AmountFilter '{self.from_to_string()}'"
+
+    def _filter(self, mutations):
+        filtered = mutations
+        if self.from_amount:
+            filtered = {x for x in mutations if x.amount >= self.from_amount}
+        if self.to_amount:
+            filtered = {x for x in filtered if x.amount < self.to_amount}
         return filtered
 
 
@@ -202,5 +256,3 @@ class FilterSet(Filter):
             dfs.append(MutationSet(mutations=filtered, description=fltr.description))
             data = data - filtered
         return dfs
-
-
