@@ -43,7 +43,8 @@ def test_amount_filter(short_mutation_sequence):
     assert len(AmountFilter(from_amount=200).apply(short_mutation_sequence)) == 7
     assert len(AmountFilter(to_amount=200).apply(short_mutation_sequence)) == 3
     assert len(AmountFilter(from_amount=100, to_amount=200).apply(short_mutation_sequence)) == 1
-
+    list(short_mutation_sequence)[0].amount = -10
+    assert len(AmountFilter(to_amount=0).apply(short_mutation_sequence)) == 1
 
 def test_string_filter_chain(mutation_sequence_with_set_descriptions):
     """Filters can be chained, so that mutations is passed through all filters in the chain

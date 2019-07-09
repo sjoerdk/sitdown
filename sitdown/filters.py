@@ -48,7 +48,7 @@ class Filter(metaclass=abc.ABCMeta):
             result of applying this filter and its parents to the given mutations
 
         """
-        return MutationSet(mutations=self.apply(mutations_in), filter_used=self)
+        return MutationSet(mutations=self.apply(mutations_in), description=self.description)
 
     @abstractmethod
     def _filter(self, data):
@@ -68,7 +68,7 @@ class Filter(metaclass=abc.ABCMeta):
 
 
 class StringFilter(Filter):
-    """A filter that matches a string in the mutation description
+    """A filter that matches a string in the mutation description. Not case-sensitive
 
     """
 
@@ -92,8 +92,33 @@ class StringFilter(Filter):
         return f"StringFilter '{self.string_to_match}'"
 
     def _filter(self, mutations):
-        filtered = {x for x in mutations if self.string_to_match in x.description}
+        filtered = {x for x in mutations if self.string_to_match.lower() in x.description.lower()}
         return filtered
+
+
+class CatchAllFilter(Filter):
+    """A filter that matches everything. Useful at the end of a FilterSet to model the 'rest' category
+
+    """
+
+    def __init__(self, description, **kwargs):
+        """
+
+        Parameters
+        ----------
+        description: str, optional
+            inherited from superclass Filter
+        """
+        super().__init__(**kwargs)
+        if not description:
+            description = 'Rest'
+        self.description = description
+
+    def __str__(self):
+        return f"CatchAllFilter '{self.description}'"
+
+    def _filter(self, mutations):
+        return mutations
 
 
 class AccountFilter(Filter):
@@ -175,12 +200,12 @@ class AmountFilter(Filter):
         self.description = description
 
     def from_to_string(self):
-        if self.from_amount:
+        if self.from_amount is not None:
             frm = str(self.from_amount)
         else:
             frm = "*"
 
-        if self.to_amount:
+        if self.to_amount is not None:
             to = str(self.to_amount)
         else:
             to = "*"
@@ -191,9 +216,9 @@ class AmountFilter(Filter):
 
     def _filter(self, mutations):
         filtered = mutations
-        if self.from_amount:
+        if self.from_amount is not None:
             filtered = {x for x in mutations if x.amount >= self.from_amount}
-        if self.to_amount:
+        if self.to_amount is not None:
             filtered = {x for x in filtered if x.amount < self.to_amount}
         return filtered
 

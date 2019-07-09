@@ -88,6 +88,9 @@ class BankAccount:
             description = str(number)
         self.description = description
 
+    def __eq__(self, other):
+        return self.description == other.description and self.number == other.number
+
     def __str__(self):
         return self.description
 

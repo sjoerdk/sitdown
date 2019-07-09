@@ -367,9 +367,11 @@ class MonthMatrix(Plottable, UserDict):
         return [x for x in month_iterator(self.min_month, self.max_month)]
 
     def matrix(self):
-        """Data summed per month, for each filtered mutations.
-        Could be sparse (Not all dates are filled for each category
+        """Data per month, per category as a 2D array
 
+        Returns
+        -------
+        Dict[Month, List[MonthBin]]
         """
 
         matrix = {}
