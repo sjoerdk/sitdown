@@ -9,6 +9,7 @@ In terms of responsibility, classifiers should reduce any ambiguity about mutati
 as much as possible, so that filters later on do not have to deal with it.
 """
 import abc
+import re
 from abc import abstractmethod
 from typing import Dict, List, Set, Union
 from yaml import load
@@ -117,8 +118,10 @@ class StringMatchClassifier(Classifier):
         return list(self.mapping.values())
 
     def classify(self, mutation) -> Set[Category]:
+        """Match all strings in mapping to mutation description. Removes excess spaces
+        from description"""
         return {cat for string, cat in self.mapping.items()
-                if string in mutation.description}
+                if string in re.sub(' +', ' ', mutation.description)}
 
 
 def string_match_classifier_from_yaml(f) -> StringMatchClassifier:
