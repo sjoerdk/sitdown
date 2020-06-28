@@ -1,8 +1,10 @@
 from collections import OrderedDict
+from tests import RESOURCE_PATH
 
 import pytest
 
-from sitdown.classifiers import Category, StringMatchClassifier
+from sitdown.classifiers import Category, StringMatchClassifier, \
+    string_match_classifier_from_yaml
 from tests.factories import MutationFactory
 
 
@@ -60,3 +62,18 @@ def test_string_match_classifier(some_categories):
     )
 
     assert len(matcher.categories()) == 4
+
+
+def test_classifier_definition():
+    """Test loading a yaml file and creating a classifier tree from it
+
+    """
+    definition_file = RESOURCE_PATH / 'classifier_definition.yaml'
+    with open(definition_file, 'r') as f:
+        classifier = string_match_classifier_from_yaml(f)
+
+    assert len(classifier.mapping) == 6
+    assert classifier.mapping['kees'].name == 'special'
+    assert classifier.mapping['kees'].parent.name == 'Pay'
+
+

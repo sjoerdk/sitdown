@@ -1,0 +1,11 @@
+# Defines nested categories and the substrings that indicate those categories
+# Can be used to build a StringMatchClassifier quickly
+Pay:
+  - Salaris
+  - Something else
+  - special:
+      - kees
+      - henk
+albert_heijn:
+  - Albert Heijn
+  - fb20

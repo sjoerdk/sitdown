@@ -10,7 +10,9 @@ as much as possible, so that filters later on do not have to deal with it.
 """
 import abc
 from abc import abstractmethod
-from typing import Set
+from typing import Dict, List, Set, Union
+from yaml import load
+from yaml.loader import Loader
 
 
 class Classifier(metaclass=abc.ABCMeta):
@@ -117,3 +119,46 @@ class StringMatchClassifier(Classifier):
     def classify(self, mutation) -> Set[Category]:
         return {cat for string, cat in self.mapping.items()
                 if string in mutation.description}
+
+
+def string_match_classifier_from_yaml(f) -> StringMatchClassifier:
+    """Build StringMatchClassifier from a yaml file. Yaml is much easier to edit
+    in real-world classifiers that often include 50+ lines
+
+    Example
+    -------
+    The YAML content
+        shopping:
+            - albert_heijn:
+                - AH betaling
+            - bakery:
+                - Johns bakery
+                - Bakery&Co
+        fun:
+            - netflix
+
+    Is equivalent to
+
+    """
+    content = load(f, Loader=Loader)
+    mapping = {}
+
+    def parse_category(name: str, items: List[Union[str, Dict]],
+                       parent: Category = None):
+        mapping_ = {}
+        current_cat = Category(name, parent=parent)
+        for item in items:
+            if type(item) == str:
+                # this a string that if matched, should assign current category
+                mapping_[item] = current_cat
+            elif type(item) == dict:
+                # this is a sub-category. recurse
+                for key, value in item.items():
+                    mapping_.update(
+                        parse_category(name=key, items=value, parent=current_cat))
+        return mapping_
+
+    for x, y in content.items():
+        mapping.update(parse_category(name=x, items=y))
+
+    return StringMatchClassifier(mapping=mapping)
