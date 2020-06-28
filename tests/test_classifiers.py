@@ -48,16 +48,15 @@ def test_string_match_classifier(some_categories):
         matcher.classify(
             MutationFactory(description="thank you for shopping at sports store alpha")
         )
-        == cat["sports"]
+        == {cat["sports"]}
     )
     assert (
         matcher.classify(MutationFactory(description="mega pool counter 1#45"))
-        == cat["pool_a"]
+        == {cat["pool_a"]}
     )
 
     assert (
-        matcher.classify(MutationFactory(description="something else"))
-        is None
+        matcher.classify(MutationFactory(description="something else")) == set()
     )
 
     assert len(matcher.categories()) == 4

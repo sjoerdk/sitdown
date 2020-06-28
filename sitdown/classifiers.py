@@ -10,6 +10,7 @@ as much as possible, so that filters later on do not have to deal with it.
 """
 import abc
 from abc import abstractmethod
+from typing import Set
 
 
 class Classifier(metaclass=abc.ABCMeta):
@@ -27,8 +28,8 @@ class Classifier(metaclass=abc.ABCMeta):
         pass
 
     @abstractmethod
-    def classify(self, mutation):
-        """Determine the category of the given mutation
+    def classify(self, mutation) -> Set['Category']:
+        """Determine the categories of the given mutation
 
         Parameters
         ----------
@@ -36,7 +37,7 @@ class Classifier(metaclass=abc.ABCMeta):
 
         Returns
         -------
-        Category
+        Set[Category]
 
         """
         pass
@@ -47,7 +48,7 @@ class Category:
 
     Can be nested. For example 'bars' and 'dinner' can both be part of 'going out' """
 
-    def __init__(self, name, parent=None):
+    def __init__(self, name: str, parent: 'Category' = None):
         """
 
         Parameters
@@ -106,16 +107,13 @@ class StringMatchClassifier(Classifier):
         ----------
         mapping: OrderedDict(str, Category)
             For each string in this dict, if the string matches, assign the
-            category. Strings are matched in order from left to right. If a
-            match is found, matching is halted.
+            category.
         """
         self.mapping = mapping
 
     def categories(self):
         return list(self.mapping.values())
 
-    def classify(self, mutation):
-        for string_to_match, category in self.mapping.items():
-            if string_to_match in mutation.description:
-                return category
-
+    def classify(self, mutation) -> Set[Category]:
+        return {cat for string, cat in self.mapping.items()
+                if string in mutation.description}
