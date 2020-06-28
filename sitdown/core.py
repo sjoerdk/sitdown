@@ -3,6 +3,9 @@
 """Main module."""
 import pickle
 from abc import ABCMeta, abstractmethod
+from typing import Set
+
+from sitdown.classifiers import Category
 
 
 class Mutation:
@@ -22,7 +25,7 @@ class Mutation:
         description="",
         balance_before=None,
         balance_after=None,
-        category=None,
+        categories: Set[Category] = None,
     ):
         """Create a transaction
 
@@ -44,8 +47,8 @@ class Mutation:
             account balance before mutation. Defaults to None
         balance_after: Decimal, optional
             account balance after mutation. Defaults to None
-        category: Category, optional
-            category to which this mutation belongs. Defaults to None
+        categories: Set[Category], optional
+            categories to which this mutation belongs. Defaults to empty set
         """
 
         self.amount = amount
@@ -56,7 +59,9 @@ class Mutation:
         self.description = description
         self.balance_before = balance_before
         self.balance_after = balance_after
-        self.category = category
+        if categories is None:
+            categories = set()
+        self.category = categories
 
     def __str__(self):
         return f"Mutation of {self.amount} on {self.date}"
@@ -68,8 +73,9 @@ class Mutation:
         return self.__hash__() == other.__hash__()
 
     def __hash__(self):
-        return hash((self.amount, self.date, str(self.account), self.currency, self.opposite_account, self.description,
-                    self.balance_before, self.balance_after))
+        return hash((self.amount, self.date, str(self.account), self.currency,
+                     self.opposite_account, self.description, self.balance_before,
+                     self.balance_after))
 
 
 class BankAccount:

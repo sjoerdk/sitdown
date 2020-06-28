@@ -11,8 +11,6 @@ as much as possible, so that filters later on do not have to deal with it.
 import abc
 from abc import abstractmethod
 
-from sitdown.core import Mutation
-
 
 class Classifier(metaclass=abc.ABCMeta):
     """Can classify a mutation by adding one or more tags to it"""
@@ -49,20 +47,20 @@ class Category:
 
     Can be nested. For example 'bars' and 'dinner' can both be part of 'going out' """
 
-    def __init__(self, name, container=None):
+    def __init__(self, name, parent=None):
         """
 
         Parameters
         ----------
         name: str
             name and unique description of this category
-        container: Category, optional
+        parent: Category, optional
             Parent category that contains this category, for example a category
             'Gym card' could have a
             container 'Sports'. Defaults to None
         """
         self.name = name
-        self.container = container
+        self.parent = parent
 
     def is_in(self, other):
         """Is this category contained by category 'other'?
@@ -71,7 +69,7 @@ class Category:
         -----
         Categories contain themselves. So
         >>> sports = Category('sports')
-        >>> gym = Category('gym', container=sports)
+        >>> gym = Category('gym', parent=sports)
         >>> gym.is_in(sports)
         >>> True
         >>> gym.is_in(gym)
@@ -90,8 +88,8 @@ class Category:
         if self.name == other.name:
             return True
         else:
-            if self.container:
-                return self.container.is_in(other)
+            if self.parent:
+                return self.parent.is_in(other)
             else:
                 return False
 

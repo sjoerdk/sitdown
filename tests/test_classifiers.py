@@ -9,10 +9,10 @@ from tests.factories import MutationFactory
 @pytest.fixture()
 def some_categories():
     sports = Category(name="sports")
-    pool = Category(name="pool", container=sports)
-    gym = Category(name="gym", container=sports)
-    pool_a = Category(name="pool_a", container=pool)
-    pool_b = Category(name="pool_b", container=pool)
+    pool = Category(name="pool", parent=sports)
+    gym = Category(name="gym", parent=sports)
+    pool_a = Category(name="pool_a", parent=pool)
+    pool_b = Category(name="pool_b", parent=pool)
 
     return {
         "gym": gym,
