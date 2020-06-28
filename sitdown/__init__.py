@@ -4,7 +4,7 @@
 
 __author__ = """Sjoerd Kerkstra"""
 __email__ = 'sjoerdk1@xs4all.nl'
-__version__ = '0.2.4'
+__version__ = '0.2.5'
 
 
 from pathlib import Path
