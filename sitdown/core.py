@@ -61,7 +61,7 @@ class Mutation:
         self.balance_after = balance_after
         if categories is None:
             categories = set()
-        self.category = categories
+        self.categories = categories
 
     def __str__(self):
         return f"Mutation of {self.amount} on {self.date}"
