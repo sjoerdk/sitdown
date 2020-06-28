@@ -319,11 +319,11 @@ class MonthBin:
 
     def sum_in(self) -> float:
         """Sum of all incoming amounts in this bin"""
-        return sum([x.amount for x in self.mutations if x > 0])
+        return sum([x.amount for x in self.mutations if x.amount > 0])
 
     def sum_out(self) -> float:
         """Sum of all outgoing amounts in this bin"""
-        return sum([x.amount for x in self.mutations if x < 0])
+        return sum([x.amount for x in self.mutations if x.amount < 0])
 
 
 def month_iterator(start_month, end_month):
