@@ -313,8 +313,17 @@ class MonthBin:
     def __lt__(self, other):
         return self.month < other.month
 
-    def sum(self):
+    def sum(self) -> float:
+        """Sum of all amounts in this bin"""
         return sum([x.amount for x in self.mutations])
+
+    def sum_in(self) -> float:
+        """Sum of all incoming amounts in this bin"""
+        return sum([x.amount for x in self.mutations if x > 0])
+
+    def sum_out(self) -> float:
+        """Sum of all outgoing amounts in this bin"""
+        return sum([x.amount for x in self.mutations if x < 0])
 
 
 def month_iterator(start_month, end_month):

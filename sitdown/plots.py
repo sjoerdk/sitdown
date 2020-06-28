@@ -13,10 +13,7 @@ def plot_balance(mutations: List[Mutation]):
     mutations.sort()
 
     _, ax = plt.subplots(figsize=(12, 12))
-    ax.set_ylim([0, 1000])
     ax.grid(b=True, which='both', color='0.65', linestyle='-')
-    ax.set_xlim([datetime.date(year=2019, month=7, day=1),
-                 datetime.date(year=2020, month=2, day=1)])
     ax.plot([x.date for x in mutations], [x.balance_after for x in mutations])
     return ax
 

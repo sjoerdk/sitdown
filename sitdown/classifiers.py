@@ -1,11 +1,12 @@
 """Modules for classifying mutations into categories
 
-Classifiers and filters serve similar purposes as both can be used to distinguish between mutations.
-The difference is that classifying is more complex and ambiguous, like 'Is this mutation about shopping
-or about sports?'. While filters should be more straightforward, like 'All incoming'
+Classifiers and filters serve similar purposes as both can be used to distinguish
+between mutations. The difference is that classifying is more complex and ambiguous,
+like 'Is this mutation about shopping or about sports?'. While filters should be
+more straightforward, like 'All incoming'
 
-In terms of responsibility, classiefiers should reduce any ambiguity about mutations as much as possible,
-so that filters later on do not have to deal with it.
+In terms of responsibility, classifiers should reduce any ambiguity about mutations
+as much as possible, so that filters later on do not have to deal with it.
 """
 import abc
 from abc import abstractmethod
@@ -56,7 +57,8 @@ class Category:
         name: str
             name and unique description of this category
         container: Category, optional
-            Parent category that contains this category, for example a category 'Gym card' could have a
+            Parent category that contains this category, for example a category
+            'Gym card' could have a
             container 'Sports'. Defaults to None
         """
         self.name = name
@@ -98,15 +100,16 @@ class Category:
 
 
 class StringMatchClassifier(Classifier):
-    """Tries to find a classification by matching strings in the mutation description"""
+    """classifies by matching strings in the mutation description"""
 
     def __init__(self, mapping):
         """
         Parameters
         ----------
         mapping: OrderedDict(str, Category)
-            For each string in this dict, if the string matches, assign the category. Strings are matched in order from
-            left to right. If a match is found, matching is halted.
+            For each string in this dict, if the string matches, assign the
+            category. Strings are matched in order from left to right. If a
+            match is found, matching is halted.
         """
         self.mapping = mapping
 
