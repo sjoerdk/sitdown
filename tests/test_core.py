@@ -16,11 +16,11 @@ def test_objects():
     assert str(account) == "test"
 
 
-def test_mutation_set(tmp_path, short_mutation_sequence):
+def test_mutation_set(tmpdir, short_mutation_sequence):
     """ Test loading and saving of a mutation set
     """
     org_set = MutationSet(mutations=short_mutation_sequence, description="test_saving")
-    file_path = tmp_path / 'mutation_set.pcl'
+    file_path = tmpdir / 'mutation_set.pcl'
     with open(file_path, 'wb') as f:
         org_set.save(file=f)
 

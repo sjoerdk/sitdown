@@ -6,7 +6,8 @@ from abc import ABCMeta, abstractmethod
 
 
 class Mutation:
-    """An increase or decrease of money on an account. Basic object for most things in sitdown.
+    """An increase or decrease of money on an account. Basic object for most things
+    in sitdown.
 
     Is sortable by date by default
     """
@@ -80,7 +81,8 @@ class BankAccount:
         number: str
             the account number
         description: str, optional
-            short description of the account. For use in graphs etc. Defaults to account number
+            short description of the account. For use in graphs etc. Defaults to
+            account number
 
         """
         self.number = number
@@ -89,7 +91,12 @@ class BankAccount:
         self.description = description
 
     def __eq__(self, other):
+        if not other:  # handle comparing to None or other falsy value
+            return False
         return self.description == other.description and self.number == other.number
+
+    def __hash__(self):
+        return hash((self.description, self.number))
 
     def __str__(self):
         return self.description
