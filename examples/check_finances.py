@@ -15,10 +15,7 @@ accounts = {'shared': BankAccount(number='254265944', description='Shared Curren
             'old_sjoerd': BankAccount(number='625335295', description='Old Sjoerd Account')}
 
 abn_downloads = [
-    r"C:\Users\z428172\Documents\financien\2017\mutaties\TXT180114183005.TAB",
-    r"C:\Users\z428172\Documents\financien\2017\mutaties\TXT180224225233.TAB",
-    r"C:\Users\z428172\Documents\financien\2019\transacties\TXT190210094911.TAB",
-    r"C:\Users\z428172\Documents\financien\2019\transacties\TXT190519210301.TAB"
+    "/home/sjoerd/Documents/finances/2020/TXT200205202318.TAB"
     ]
 
 reader = ABNAMROReader(accounts=list(accounts.values()))
@@ -33,7 +30,7 @@ sjoerds = [x for x in all if x.account == accounts['sjoerd']]
 def in_out(mutations):
     ax = None
     if not ax:
-        _, ax = plt.subplots(figsize=(12, 12))
+        _, ax = plt.subplots(figsize=(30, 30))
 
     incoming = MonthSeries([x for x in mutations if x.amount > 0])
     outgoing = MonthSeries([x for x in mutations if x.amount <= 0])
@@ -56,7 +53,21 @@ def in_out(mutations):
 
     test = 1
 
-in_out([x for x in all if x.account == accounts['shared']])
+
+def plot_balance(mutations):
+    mutations.sort()
+
+    _, ax = plt.subplots(figsize=(12, 12))
+    ax.set_ylim([0, 1000])
+    ax.grid(b=True, which='both', color='0.65', linestyle='-')
+    ax.set_xlim([datetime.date(year=2019, month=7, day=1),
+                 datetime.date(year=2020, month=2, day=1)])
+    ax.plot([x.date for x in mutations], [x.balance_after for x in mutations])
+
+
+shared = [x for x in all if x.account == accounts['shared']]
+#in_out(shared)
+plot_balance(shared)
 #in_out([x for x in all])
 
 plt.show()
