@@ -118,10 +118,13 @@ class StringMatchClassifier(Classifier):
         return list(self.mapping.values())
 
     def classify(self, mutation) -> Set[Category]:
-        """Match all strings in mapping to mutation description. Removes excess spaces
-        from description"""
+        """Match all strings in mapping to mutation description case (insensitive).
+         Removes excess spaces from description"""
+        def normalise(string):
+            """Remove double spaces, make lower case. Just remove some weirdness"""
+            return re.sub(' +', ' ', string).lower()
         return {cat for string, cat in self.mapping.items()
-                if string in re.sub(' +', ' ', mutation.description)}
+                if normalise(string) in normalise(mutation.description)}
 
 
 def string_match_classifier_from_yaml(f) -> StringMatchClassifier:
