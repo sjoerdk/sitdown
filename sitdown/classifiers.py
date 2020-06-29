@@ -66,6 +66,12 @@ class Category:
         self.name = name
         self.parent = parent
 
+    def __hash__(self):
+        return hash((self.name, self.parent))
+
+    def __eq__(self, other):
+        return self.__hash__() == other.__hash__()
+
     def is_in(self, other):
         """Is this category contained by category 'other'?
 
