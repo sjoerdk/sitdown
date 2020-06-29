@@ -11,7 +11,7 @@ as much as possible, so that filters later on do not have to deal with it.
 import abc
 import re
 from abc import abstractmethod
-from typing import Dict, List, Set, Union
+from typing import Dict, List, Optional, Set, Union
 from yaml import load
 from yaml.loader import Loader
 
@@ -96,6 +96,15 @@ class Category:
                 return self.parent.is_in(other)
             else:
                 return False
+
+    def root(self) -> 'Category':
+        """The topmost parent category. If a category has no parent, it is its own
+        root
+        """
+        if self.parent:
+            return self.parent.root()
+        else:
+            return self
 
     def __str__(self):
         return self.name

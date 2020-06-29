@@ -36,6 +36,12 @@ def test_categories(some_categories):
     assert str(cat["sports"]) == 'sports'
 
 
+def test_category_root(some_categories):
+    cat = some_categories
+    assert cat['pool_a'].root() == cat['sports']
+    assert cat['sports'].root() == cat['sports']
+
+
 def test_string_match_classifier(some_categories):
     cat = some_categories
     mapping = OrderedDict({
