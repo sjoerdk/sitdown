@@ -58,6 +58,7 @@ def test_string_match_classifier(some_categories):
         "mega pool": cat["pool_a"],
         "ultra pool": cat["pool_b"],
         "sports store alpha": cat["sports"],
+        "sports store beta": cat["sports"]
     })
 
     matcher = StringMatchClassifier(mapping=mapping)
@@ -76,7 +77,7 @@ def test_string_match_classifier(some_categories):
         matcher.classify(MutationFactory(description="something else")) == set()
     )
 
-    assert len(matcher.categories()) == 4
+    assert len(matcher.categories()) == 4  # should not include duplicate category
 
 
 def test_classifier_definition():

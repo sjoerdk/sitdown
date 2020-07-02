@@ -129,8 +129,9 @@ class StringMatchClassifier(Classifier):
         """
         self.mapping = mapping
 
-    def categories(self):
-        return list(self.mapping.values())
+    def categories(self) -> List[Category]:
+        """All unique categories used in this classifier"""
+        return list(set(self.mapping.values()))
 
     def classify(self, mutation) -> Set[Category]:
         """Match all strings in mapping to mutation description case (insensitive).
